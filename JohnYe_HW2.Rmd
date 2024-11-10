@@ -1,0 +1,83 @@
+---
+title: "JohnYe_HW2"
+author: "John Ye"
+date: "2024-09-06"
+output:
+  word_document: default
+  pdf_document: default
+---
+## 1.a Read the data from the csv file
+```{r}
+red_wine_data <- read.csv("winequality-red.csv", header = TRUE)
+head(red_wine_data)
+
+```
+## 1.b Find the median of quality and the mean of alcohol
+```{r}
+median_quality <- median(red_wine_data$quality, na.rm = TRUE)
+print(paste("Median of Quality:", median_quality))
+mean_alcohol <- mean(red_wine_data$alcohol)
+print(paste("Mean of Alcohol:", mean_alcohol))
+```
+## 1.c Scatterpolt between density and volatile_acidity
+```{r}
+library(ggplot2)
+ggplot(red_wine_data, aes(x = density, y = volatile_acidity)) + 
+  geom_point()+
+  xlab("Density") + 
+  ylab("Volatile Acidity") +
+  ggtitle("Density vs.Volatile Acidity: Entire Sample")
+
+# Observation
+#From the Graph we can see most of the wine have a density between 0.995 and 0.9975, and volatile acidity between 0.2 to 0.8. 
+```
+
+
+## 1.d Create a new qualitative variable ALevel, by binning Alcohol into High with alcohol greater than 10.5 and Medium otherwise.
+```{r}
+library(dplyr)
+library(ggplot2)
+red_wine_data <- red_wine_data %>%
+  mutate(ALevel = ifelse(red_wine_data$alcohol > 10.5, "High", "Medium"))
+#head(red_wine_data)
+
+
+# Create a new variable sulphates/chlorides
+red_wine_data$SulOverChl = red_wine_data$sulphates / red_wine_data$chlorides
+
+# Create a side-by-side boxplot for ratio and ALevel
+ggplot(red_wine_data, aes(x = SulOverChl, y = ALevel)) +
+  geom_boxplot() +
+  labs(x = "Sulphats / Chlorides", y = "ALevel", title = "Origin Boxplot")
+
+# Numbers of the High item
+#filter(red_wine_data, red_wine_data$ALevel == "High")
+SumOfHigh = sum(red_wine_data$ALevel == "High")
+print(paste("There are",SumOfHigh, "samples are in High category."))
+```
+## 1.e Create a histogram showing the citric_acid numbers for both High and Medium samples.
+```{r}
+library(ggplot2)
+ggplot(red_wine_data, aes(x = citric_acid, fill = ALevel)) + 
+  geom_histogram(bins = 20, position = "dodge") +
+  labs(x = "Citric Acid", y = "Count", title = "Citric Acid Over ALevel Graph")
+```
+## 1.f Create two new plot of any type.
+```{r}
+library(ggplot2)
+
+ggplot(red_wine_data, aes(x = factor(quality), y = pH)) + 
+  geom_boxplot() +
+  labs(x = "Quality", y = "pH", title = "Quality Vs. pH")
+
+ggplot(red_wine_data, aes(x = factor(quality), y = residual_sugar)) + 
+  geom_boxplot() +
+  labs(x = "Quality", y = "Residual Sugar", title = "Quality Vs. Residual Sugar")
+```
+
+##Summary.
+
+* One of my hypothesis is that pH has an effection of quality, the higher(or lower) the pH is, the lower the quality will be. From the boxplot, we can see that most of the pH is between 3.0 and 3.5, and the median for each box is decreasing while the quality is increasing. Therefore, my hypothesis is right since while quality is increasing, the pH is smaller than the low quality data.
+* My another hypothesis is that the residual sugar can affect the quality as well. The higher the residual sugar is, the lower the quality will be. However, from the boxplot graph generated, we can see that the median for each box do not change a lot while the quality is increasing. Also, since the graph has so many outliers, it may mean that the residual suger has no effect on quality at all.
+
+## 2.a Which predictors are quantitative and which are qualitative?
